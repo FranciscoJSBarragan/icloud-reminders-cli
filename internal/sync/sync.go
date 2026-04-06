@@ -3,6 +3,7 @@ package sync
 
 import (
 	"fmt"
+	"strings"
 
 	"icloud-reminders/internal/auth"
 	"icloud-reminders/internal/cache"
@@ -332,13 +333,5 @@ func getFieldRefName(fields map[string]interface{}, key string) string {
 }
 
 func toLower(s string) string {
-	result := make([]byte, len(s))
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if c >= 'A' && c <= 'Z' {
-			c += 32
-		}
-		result[i] = c
-	}
-	return string(result)
+	return strings.ToLower(s)
 }

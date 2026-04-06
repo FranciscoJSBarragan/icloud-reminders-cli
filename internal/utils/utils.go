@@ -177,7 +177,8 @@ func ExtractTitle(tdB64 string) string {
 }
 
 // TsToStr converts a millisecond timestamp to YYYY-MM-DD string.
-// Returns empty string if tsMs is 0.
+// CloudKit Reminders stores DueDate as naive wall-clock time (not true UTC),
+// so we read it back as UTC to preserve the original wall-clock value.
 func TsToStr(tsMs int64) string {
 	if tsMs == 0 {
 		return ""
@@ -186,13 +187,31 @@ func TsToStr(tsMs int64) string {
 	return t.Format("2006-01-02")
 }
 
-// StrToTs converts a YYYY-MM-DD string to milliseconds timestamp.
+// StrToTs converts a date string to milliseconds timestamp.
+// Accepts YYYY-MM-DDTHH:MM (with exact time) or YYYY-MM-DD (date only, midnight).
+//
+// IMPORTANT: CloudKit Reminders treats DueDate as naive wall-clock time.
+// The iPhone displays the stored epoch ms directly without UTC→local conversion.
+// Therefore we parse the input as UTC (using time.Parse, not ParseInLocation)
+// so that "13:30" → epoch ms for 13:30 UTC → iPhone displays 1:30 PM.
 func StrToTs(dateStr string) (int64, error) {
-	t, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
-		return 0, err
+	// Try datetime format first: YYYY-MM-DDTHH:MM
+	t, err := time.Parse("2006-01-02T15:04", dateStr)
+	if err == nil {
+		return t.UnixMilli(), nil
 	}
-	return t.UTC().UnixMilli(), nil
+	// Fall back to date-only format: YYYY-MM-DD
+	t, err = time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return 0, fmt.Errorf("invalid date %q (expected YYYY-MM-DD or YYYY-MM-DDTHH:MM)", dateStr)
+	}
+	return t.UnixMilli(), nil
+}
+
+// HasTime returns true if the date string includes a time component (YYYY-MM-DDTHH:MM).
+func HasTime(dateStr string) bool {
+	_, err := time.Parse("2006-01-02T15:04", dateStr)
+	return err == nil
 }
 
 // generateUUID generates a random 16-byte UUID (v4).

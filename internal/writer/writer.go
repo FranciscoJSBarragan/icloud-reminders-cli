@@ -342,7 +342,7 @@ func (w *Writer) EditReminder(reminderID, title, dueDate, notes, priority string
 		if err == nil {
 			fields["DueDate"] = map[string]interface{}{"value": ts}
 		} else {
-			return errResult(fmt.Errorf("invalid due date %q (expected YYYY-MM-DD): %w", dueDate, err)), nil
+			return errResult(fmt.Errorf("invalid due date %q (expected YYYY-MM-DD or YYYY-MM-DDTHH:MM): %w", dueDate, err)), nil
 		}
 	}
 

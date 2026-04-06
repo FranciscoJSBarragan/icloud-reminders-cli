@@ -4,7 +4,7 @@
 
 set -e
 
-REPO="tarekbecker/icloud-reminders-cli"
+REPO="FranciscoJSBarragan/icloud-reminders-cli"
 BINARY_NAME="reminders"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 

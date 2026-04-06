@@ -104,7 +104,7 @@ func New() *Authenticator {
 		clientID: "auth-" + frameID,
 		frameID:  frameID,
 		jar:      jar,
-		client:   &http.Client{Jar: jar},
+		client:   &http.Client{Jar: jar, Timeout: 30 * time.Second},
 	}
 }
 
@@ -227,7 +227,7 @@ func (a *Authenticator) fullAuth(sessionFile string) (*SessionData, error) {
 
 	// Reset state
 	a.jar, _ = cookiejar.New(nil)
-	a.client = &http.Client{Jar: a.jar}
+	a.client = &http.Client{Jar: a.jar, Timeout: 30 * time.Second}
 	a.data = SessionData{}
 
 	// Step 1: Initialize auth session
@@ -319,9 +319,13 @@ func (a *Authenticator) authStart() error {
 
 // authFederate submits the email address.
 func (a *Authenticator) authFederate() error {
-	body := fmt.Sprintf(`{"accountName":"%s","rememberMe":true}`, a.username)
+	bodyMap := map[string]interface{}{
+		"accountName": a.username,
+		"rememberMe":  true,
+	}
+	bodyJSON, _ := json.Marshal(bodyMap)
 
-	req, err := http.NewRequest("POST", AuthEndpoint+"/federate?isRememberMeEnabled=true", strings.NewReader(body))
+	req, err := http.NewRequest("POST", AuthEndpoint+"/federate?isRememberMeEnabled=true", bytes.NewReader(bodyJSON))
 	if err != nil {
 		return err
 	}
