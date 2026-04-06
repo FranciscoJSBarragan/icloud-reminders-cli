@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -177,22 +178,33 @@ func ExtractTitle(tdB64 string) string {
 }
 
 // TsToStr converts a millisecond timestamp to YYYY-MM-DD string.
-// Returns empty string if tsMs is 0.
+// Uses local timezone (respects TZ env var) instead of UTC.
 func TsToStr(tsMs int64) string {
 	if tsMs == 0 {
 		return ""
 	}
-	t := time.UnixMilli(tsMs).UTC()
+	t := time.UnixMilli(tsMs).In(localTZ())
 	return t.Format("2006-01-02")
 }
 
 // StrToTs converts a YYYY-MM-DD string to milliseconds timestamp.
+// Uses local timezone (respects TZ env var) instead of UTC.
 func StrToTs(dateStr string) (int64, error) {
-	t, err := time.Parse("2006-01-02", dateStr)
+	t, err := time.ParseInLocation("2006-01-02", dateStr, localTZ())
 	if err != nil {
 		return 0, err
 	}
-	return t.UTC().UnixMilli(), nil
+	return t.UnixMilli(), nil
+}
+
+// localTZ returns the timezone from TZ env var, falling back to system local.
+func localTZ() *time.Location {
+	if tz := os.Getenv("TZ"); tz != "" {
+		if loc, err := time.LoadLocation(tz); err == nil {
+			return loc
+		}
+	}
+	return time.Local
 }
 
 // generateUUID generates a random 16-byte UUID (v4).

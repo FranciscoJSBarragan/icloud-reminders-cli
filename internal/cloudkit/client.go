@@ -111,7 +111,7 @@ func NewFromSession(sess *auth.SessionData) (*Client, error) {
 	}
 
 	return &Client{
-		http:   &http.Client{Jar: jar},
+		http:   &http.Client{Jar: jar, Timeout: 30 * time.Second},
 		ckBase: base,
 	}, nil
 }
