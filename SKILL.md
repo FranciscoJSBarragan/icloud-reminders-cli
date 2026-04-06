@@ -109,7 +109,10 @@ reminders lists
 reminders add "Buy milk" -l "Einkauf"
 
 # Add with due date and priority
-reminders add "Call mom" -l "Einkauf" --due 2026-02-25 --priority high
+reminders add "Call mom" -l "Groceries" --due 2026-02-25 --priority high
+
+# Add with due date and exact time
+reminders add "Meeting" -l "Work" --due 2026-02-25T14:30
 
 # Add with notes
 reminders add "Buy milk" -l "Einkauf" --notes "Get the organic 2% stuff"
@@ -126,6 +129,7 @@ reminders add-batch "Butter" "Käse" -l "Einkauf" --parent ABC123DE
 # Edit a reminder (update title, due date, notes, or priority)
 reminders edit abc123 --title "New title"
 reminders edit abc123 --due 2026-03-01 --priority high
+reminders edit abc123 --due 2026-03-01T09:00
 reminders edit abc123 --notes "Updated notes"
 reminders edit abc123 --priority none
 

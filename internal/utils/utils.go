@@ -187,14 +187,27 @@ func TsToStr(tsMs int64) string {
 	return t.Format("2006-01-02")
 }
 
-// StrToTs converts a YYYY-MM-DD string to milliseconds timestamp.
+// StrToTs converts a date string to milliseconds timestamp.
+// Accepts YYYY-MM-DDTHH:MM (with exact time) or YYYY-MM-DD (date only, midnight).
 // Uses local timezone (respects TZ env var) instead of UTC.
 func StrToTs(dateStr string) (int64, error) {
-	t, err := time.ParseInLocation("2006-01-02", dateStr, localTZ())
+	// Try datetime format first: YYYY-MM-DDTHH:MM
+	t, err := time.ParseInLocation("2006-01-02T15:04", dateStr, localTZ())
+	if err == nil {
+		return t.UnixMilli(), nil
+	}
+	// Fall back to date-only format: YYYY-MM-DD
+	t, err = time.ParseInLocation("2006-01-02", dateStr, localTZ())
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("invalid date %q (expected YYYY-MM-DD or YYYY-MM-DDTHH:MM)", dateStr)
 	}
 	return t.UnixMilli(), nil
+}
+
+// HasTime returns true if the date string includes a time component (YYYY-MM-DDTHH:MM).
+func HasTime(dateStr string) bool {
+	_, err := time.ParseInLocation("2006-01-02T15:04", dateStr, localTZ())
+	return err == nil
 }
 
 // localTZ returns the timezone from TZ env var, falling back to system local.

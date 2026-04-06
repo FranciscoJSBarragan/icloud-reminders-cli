@@ -89,7 +89,7 @@ var addBatchCmd = &cobra.Command{
 
 func init() {
 	addCmd.Flags().StringVarP(&addListName, "list", "l", "", "List name (required)")
-	addCmd.Flags().StringVarP(&addDue, "due", "d", "", "Due date (YYYY-MM-DD)")
+	addCmd.Flags().StringVarP(&addDue, "due", "d", "", "Due date (YYYY-MM-DD) or datetime (YYYY-MM-DDTHH:MM)")
 	addCmd.Flags().StringVarP(&addPriority, "priority", "p", "", "Priority (high, medium, low)")
 	addCmd.Flags().StringVarP(&addNotes, "notes", "n", "", "Notes")
 	addCmd.Flags().StringVar(&addParent, "parent", "", "Parent reminder ID (creates subtask)")

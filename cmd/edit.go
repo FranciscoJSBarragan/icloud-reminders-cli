@@ -45,7 +45,7 @@ Examples:
 
 func init() {
 	editCmd.Flags().StringVar(&editTitle, "title", "", "New title")
-	editCmd.Flags().StringVarP(&editDue, "due", "d", "", "New due date (YYYY-MM-DD)")
+	editCmd.Flags().StringVarP(&editDue, "due", "d", "", "New due date (YYYY-MM-DD) or datetime (YYYY-MM-DDTHH:MM)")
 	editCmd.Flags().StringVarP(&editNotes, "notes", "n", "", "New notes")
 	editCmd.Flags().StringVarP(&editPriority, "priority", "p", "", "New priority (high, medium, low, none)")
 }
