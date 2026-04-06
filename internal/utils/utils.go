@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -210,13 +211,44 @@ func HasTime(dateStr string) bool {
 	return err == nil
 }
 
-// localTZ returns the timezone from TZ env var, falling back to system local.
+// localTZ returns the system's local timezone, with multiple detection strategies
+// to work correctly on Linux systems where time.Local may silently fall back to UTC
+// (e.g. when tzdata is not installed or the binary was compiled with CGO_ENABLED=0).
+//
+// Detection order:
+//  1. $TZ environment variable (explicit override, highest priority)
+//  2. /etc/localtime symlink → resolve to IANA name (e.g. "America/Mexico_City")
+//  3. /etc/timezone file (Debian/Ubuntu)
+//  4. time.Local (Go runtime fallback)
 func localTZ() *time.Location {
+	// 1. Respect explicit TZ env var.
 	if tz := os.Getenv("TZ"); tz != "" {
 		if loc, err := time.LoadLocation(tz); err == nil {
 			return loc
 		}
 	}
+
+	// 2. Resolve /etc/localtime symlink → extract IANA name from path.
+	// On most Linux distros, /etc/localtime -> /usr/share/zoneinfo/America/Mexico_City
+	if target, err := filepath.EvalSymlinks("/etc/localtime"); err == nil {
+		const marker = "zoneinfo/"
+		if idx := strings.LastIndex(target, marker); idx != -1 {
+			tzName := target[idx+len(marker):]
+			if loc, err := time.LoadLocation(tzName); err == nil {
+				return loc
+			}
+		}
+	}
+
+	// 3. Read /etc/timezone (Debian/Ubuntu style).
+	if data, err := os.ReadFile("/etc/timezone"); err == nil {
+		tzName := strings.TrimSpace(string(data))
+		if loc, err := time.LoadLocation(tzName); err == nil {
+			return loc
+		}
+	}
+
+	// 4. Fall back to Go's runtime local timezone.
 	return time.Local
 }
 
