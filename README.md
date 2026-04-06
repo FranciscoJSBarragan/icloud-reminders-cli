@@ -16,7 +16,7 @@ Access and manage Apple iCloud Reminders via CloudKit API. Full CRUD with hierar
 The easiest way to install on macOS and Linux:
 
 ```bash
-brew tap tarekbecker/tap
+brew tap FranciscoJSBarragan/tap
 brew install icloud-reminders
 ```
 
@@ -30,12 +30,12 @@ brew upgrade icloud-reminders
 One-line install for any platform:
 
 ```bash
-curl -sL https://github.com/tarekbecker/icloud-reminders-cli/releases/latest/download/install.sh | bash
+curl -sL https://github.com/FranciscoJSBarragan/icloud-reminders-cli/releases/latest/download/install.sh | bash
 ```
 
 ### Pre-built Binary
 
-Download manually for your platform from [GitHub Releases](https://github.com/tarekbecker/icloud-reminders-cli/releases).
+Download manually for your platform from [GitHub Releases](https://github.com/FranciscoJSBarragan/icloud-reminders-cli/releases).
 
 ### Build from Source
 
@@ -43,7 +43,7 @@ Requires Go 1.22+:
 
 ```bash
 bash scripts/build.sh
-sudo cp go/reminders /usr/local/bin/
+sudo cp scripts/reminders /usr/local/bin/reminders
 ```
 
 ## Setup
