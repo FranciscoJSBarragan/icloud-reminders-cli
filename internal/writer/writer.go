@@ -341,11 +341,6 @@ func (w *Writer) EditReminder(reminderID, title, dueDate, notes, priority string
 		ts, err := utils.StrToTs(dueDate)
 		if err == nil {
 			fields["DueDate"] = map[string]interface{}{"value": ts}
-			if utils.HasTime(dueDate) {
-				fields["DueDateIsAllDay"] = map[string]interface{}{"value": 0}
-			} else {
-				fields["DueDateIsAllDay"] = map[string]interface{}{"value": 1}
-			}
 		} else {
 			return errResult(fmt.Errorf("invalid due date %q (expected YYYY-MM-DD or YYYY-MM-DDTHH:MM): %w", dueDate, err)), nil
 		}
@@ -451,11 +446,6 @@ func buildCreateOp(title, listID, parentRef, dueDate string, priority int, notes
 		ts, err := utils.StrToTs(dueDate)
 		if err == nil {
 			fields["DueDate"] = map[string]interface{}{"value": ts}
-			if utils.HasTime(dueDate) {
-				fields["DueDateIsAllDay"] = map[string]interface{}{"value": 0}
-			} else {
-				fields["DueDateIsAllDay"] = map[string]interface{}{"value": 1}
-			}
 		}
 	}
 
